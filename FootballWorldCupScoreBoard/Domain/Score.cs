@@ -1,16 +1,9 @@
 ﻿namespace FootballWorldCupScoreBoard.Domain
 {
-    public sealed class Score
+    public sealed class Score(int home = 0, int away = 0)
     {
-        public int Home { get; private set; }
-        public int Away { get; private set; }
-
-        public Score(int home = 0, int away = 0)
-        {
-            if (home < 0 || away < 0) throw new ArgumentOutOfRangeException("Score cannot be negative.");
-            Home = home;
-            Away = away;
-        }
+        public int Home { get; private set; } = home;
+        public int Away { get; private set; } = away;
 
         public int Total => Home + Away;
 
