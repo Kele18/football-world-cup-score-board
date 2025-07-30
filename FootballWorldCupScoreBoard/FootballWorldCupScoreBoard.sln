@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FootballWorldCupScoreBoard", "FootballWorldCupScoreBoard.csproj", "{91CB5A6B-0155-45DF-8B5E-86A3FAA4651B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorldCupScoreBoard.Tests", "..\WorldCupScoreBoard.Tests\WorldCupScoreBoard.Tests.csproj", "{3BAC61DA-A01F-44A4-B3FC-97F1E6E1969B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{91CB5A6B-0155-45DF-8B5E-86A3FAA4651B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91CB5A6B-0155-45DF-8B5E-86A3FAA4651B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91CB5A6B-0155-45DF-8B5E-86A3FAA4651B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91CB5A6B-0155-45DF-8B5E-86A3FAA4651B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BAC61DA-A01F-44A4-B3FC-97F1E6E1969B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BAC61DA-A01F-44A4-B3FC-97F1E6E1969B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BAC61DA-A01F-44A4-B3FC-97F1E6E1969B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BAC61DA-A01F-44A4-B3FC-97F1E6E1969B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
