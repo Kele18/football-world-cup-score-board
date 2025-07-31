@@ -38,7 +38,11 @@ namespace FootballWorldCupScoreBoard.Service
 
         public List<Match> MatchesSummary()
         {
-            throw new NotImplementedException();
+            return dataSource.GetAllMatches()
+                             .Where(m => m.Status == MatchStatus.InProgress)
+                             .OrderByDescending(m => m.Score.Home + m.Score.Away)
+                             .ThenByDescending(m => m.StartTime)
+                             .ToList();
         }
     }
 }
