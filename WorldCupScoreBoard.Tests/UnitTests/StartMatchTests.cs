@@ -8,65 +8,117 @@ namespace WorldCupScoreBoard.Tests.UnitTests
     public class StartMatchTests : StartMatchDriver
     {
         [Fact]
-        public void StartMatch_SaveToRepository_ReturnMatch()
+        public void StartMatch_ValidScheduledMatch_StartsSuccessfully()
         {
-            var beforeStart = DateTime.UtcNow;
+            var before = DateTime.UtcNow;
 
-            var result = Sut.StartMatch(Home, Away);
+            var result = Sut.StartMatch(ScheduledMatch.Id);
 
-            var afterStart = DateTime.UtcNow;
+            var after = DateTime.UtcNow;
+            result.Id.Should().Be(ScheduledMatch.Id);
+            result.Status.Should().Be(MatchStatus.InProgress);
+            result.StartTime.Should().BeOnOrAfter(before).And.BeOnOrBefore(after);
 
-            result.Should().BeEquivalentTo(Match, o => o.Excluding(i => i.Id)
-                                                        .Excluding(o => o.StartTime));
-
-            result.StartTime.Should().BeOnOrAfter(beforeStart).And.BeOnOrBefore(afterStart);
-            VerifyDataSourcAddCalled();
+            VerifyScheduledMatchRemoved();
+            VerifyMatchAddedToActive();
         }
 
         [Fact]
-        public void StartMatch_MatchAlreadyStarted_ThrowException()
+        public void StartMatch_MatchNotScheduled_ThrowsKeyNotFound()
         {
-            SetupMatchAlreadyStarted();
+            SetupMatchNotScheduled();
 
-            Action act = () => Sut.StartMatch(Home, Away);
+            var act = () => Sut.StartMatch(ScheduledMatch.Id);
 
-            act.Should().Throw<InvalidOperationException>()
-               .WithMessage("Match already started.");
+            act.Should().Throw<KeyNotFoundException>().WithMessage("Scheduled match not found.");
+        }
+
+        [Fact]
+        public void StartMatch_RemoveFromScheduledFails_Throws()
+        {
+            SetupRemovefromScheduleDataSourceFails();
+
+            var act = () => Sut.StartMatch(ScheduledMatch.Id);
+
+            act.Should().Throw<InvalidOperationException>().WithMessage("Could not remove match from scheduled list.");
+        }
+
+        [Fact]
+        public void StartMatch_AddToDataSourceFails_Throws()
+        {
+            SetupAddStartedGameFails();
+
+            var act = () => Sut.StartMatch(ScheduledMatch.Id);
+
+            act.Should().Throw<InvalidOperationException>().WithMessage("Failed to start match. It may already be active.");
+        }
+
+        [Fact]
+        public void Match_Start_WhenAlreadyInProgressOrFinished_Throws()
+        {
+            var match = new Match(new Team("A"), new Team("B"), DateTime.UtcNow);
+            match.GetType().GetProperty(nameof(Match.Status))!.SetValue(match, MatchStatus.Finished);
+
+            var act = () => match.Start();
+
+            act.Should().Throw<InvalidOperationException>().WithMessage("Only scheduled matches can be started.");
+        }
+
+        [Fact]
+        public void Match_Start_WhenScheduled_TransitionsToInProgress()
+        {
+            var match = new Match(new Team("X"), new Team("Y"), DateTime.UtcNow);
+            match.GetType().GetProperty(nameof(Match.Status))!.SetValue(match, MatchStatus.Scheduled);
+
+            match.Start();
+
+            match.Status.Should().Be(MatchStatus.InProgress);
+            match.StartTime.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
         }
     }
 
     public class StartMatchDriver : ScoreBoardServiceDriver
     {
-        public Guid MatchId { get; set; }
-        public Team Home { get; }
-        public Team Away { get; }
-
-        public Match Match { get; set; }
+        public Match ScheduledMatch { get; }
 
         public StartMatchDriver()
         {
-            Home = new Team("Italy");
-            Away = new Team("Spain");
+            var home = new Team("Italy");
+            var away = new Team("Spain");
 
-            Match = new Match(Home, Away);
-            _dataSource.Setup(i => i.Add(It.Is<Match>(j => j.AwayTeam == Away &&
-                                                            j.HomeTeam == Home &&
-                                                            j.Id != Guid.Empty &&
-                                                            j.Status == MatchStatus.InProgress))).Returns(true);
+            ScheduledMatch = new Match(home, away, DateTime.UtcNow.AddMinutes(10));
+            typeof(Match)
+                .GetProperty(nameof(Match.Status))!
+                .SetValue(ScheduledMatch, MatchStatus.Scheduled);
+
+            _scheduledMatchDataSource.Setup(i => i.GetMatch(ScheduledMatch.Id)).Returns(ScheduledMatch);
+            _scheduledMatchDataSource.Setup(i => i.Remove(ScheduledMatch.Id)).Returns(true);
+            _dataSource.Setup(i => i.Add(ScheduledMatch)).Returns(true);
         }
 
-        public void SetupMatchAlreadyStarted()
+        public void SetupAddStartedGameFails()
         {
-            _dataSource.Setup(i => i.Add(It.Is<Match>(j => j.HomeTeam == Home && j.AwayTeam == Away)))
-                       .Returns(false);
+            _dataSource.Setup(i => i.Add(ScheduledMatch)).Returns(false);
         }
 
-        public void VerifyDataSourcAddCalled()
+        public void SetupRemovefromScheduleDataSourceFails()
         {
-            _dataSource.Verify(i => i.Add(It.Is<Match>(j => j.AwayTeam == Away &&
-                                                            j.HomeTeam == Home &&
-                                                            j.Id != Guid.Empty &&
-                                                            j.Status == MatchStatus.InProgress)), Times.Once());
+            _scheduledMatchDataSource.Setup(i => i.Remove(ScheduledMatch.Id)).Returns(false);
+        }
+
+        public void SetupMatchNotScheduled()
+        {
+            _scheduledMatchDataSource.Setup(i => i.GetMatch(ScheduledMatch.Id)).Returns(() => null);
+        }
+
+        public void VerifyScheduledMatchRemoved()
+        {
+            _scheduledMatchDataSource.Verify(i => i.Remove(ScheduledMatch.Id), Times.Once);
+        }
+
+        public void VerifyMatchAddedToActive()
+        {
+            _dataSource.Verify(i => i.Add(ScheduledMatch), Times.Once);
         }
     }
 }

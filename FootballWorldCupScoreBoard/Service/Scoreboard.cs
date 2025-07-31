@@ -4,16 +4,36 @@ using Microsoft.Extensions.Logging;
 
 namespace FootballWorldCupScoreBoard.Service
 {
-    public class Scoreboard(IMatchDataSource dataSource, ILogger<IScoreboard> logger) : IScoreboard
+    public class Scoreboard(
+        IMatchDataSource dataSource,
+        IScheduledMatchDataSource scheduledMatchDataSource,
+        ILogger<IScoreboard> logger) : IScoreboard
     {
-        public Match StartMatch(Team home, Team away)
+        public Match ScheduleMatch(Team home, Team away, DateTime scheduledTime)
         {
-            logger.LogInformation("Starting match between: Home: {Home} and Away :{Away}", home.Name, away.Name);
-            var match = new Match(home, away);
+            var match = Match.CreateScheduled(home, away, scheduledTime);
+            if (!scheduledMatchDataSource.Add(match))
+                throw new InvalidOperationException("Match already scheduled.");
 
-            if (!dataSource.Add(match)) throw new InvalidOperationException("Match already started.");
+            logger.LogInformation("Scheduled match: {Home} vs {Away} at {Time}", home.Name, away.Name, scheduledTime);
+            return match;
+        }
 
-            logger.LogInformation("Match between: Home: {Home} and Away :{Away} started {Id}", home.Name, away.Name, match.Id);
+        public Match StartMatch(Guid matchId)
+        {
+            var match = scheduledMatchDataSource.GetMatch(matchId)
+             ?? throw new KeyNotFoundException("Scheduled match not found.");
+
+            match.Start();
+
+            if (!scheduledMatchDataSource.Remove(matchId))
+                throw new InvalidOperationException("Could not remove match from scheduled list.");
+
+            if (!dataSource.Add(match))
+                throw new InvalidOperationException("Failed to start match. It may already be active.");
+
+            logger.LogInformation("Started match: {Home} vs {Away}", match.HomeTeam.Name, match.AwayTeam.Name);
+
             return match;
         }
 

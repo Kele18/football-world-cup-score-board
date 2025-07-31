@@ -4,7 +4,9 @@ namespace FootballWorldCupScoreBoard.Interface
 {
     public interface IScoreboard
     {
-        Match StartMatch(Team home, Team away);
+        Match ScheduleMatch(Team home, Team away, DateTime scheduledTime);
+
+        Match StartMatch(Guid matchId);
 
         void UpdateScore(Guid matchId, int homeScore, int awayScore);
 

@@ -12,4 +12,7 @@ namespace FootballWorldCupScoreBoard.Interface
 
         IEnumerable<Match> GetAllMatches();
     }
+
+    public interface IScheduledMatchDataSource : IMatchDataSource
+    { }
 }

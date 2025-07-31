@@ -49,6 +49,9 @@ namespace WorldCupScoreBoard.Tests.UnitTests
 
     public class MatchesSummaryDriver : ScoreBoardServiceDriver
     {
+        private readonly Team teamA;
+        private readonly Team teamD;
+
         public Match MatchWithHighestScore { get; }
         public Match MatchWithLowerScoreNewer { get; }
         public Match MatchWithLowerScoreOlder { get; }
@@ -56,10 +59,10 @@ namespace WorldCupScoreBoard.Tests.UnitTests
 
         public MatchesSummaryDriver()
         {
-            var teamA = new Team("Team A");
+            teamA = new Team("Team A");
             var teamB = new Team("Team B");
             var teamC = new Team("Team C");
-            var teamD = new Team("Team D");
+            teamD = new Team("Team D");
 
             MatchWithHighestScore = new Match(teamA, teamB);
             MatchWithLowerScoreNewer = new Match(teamB, teamC);
@@ -92,7 +95,14 @@ namespace WorldCupScoreBoard.Tests.UnitTests
 
         public void SetupOnlyFinishedMatches()
         {
-            FinishedMatch.Finish(90);
+            typeof(Match)
+                .GetProperty(nameof(Match.Status))!
+                .SetValue(FinishedMatch, MatchStatus.Finished);
+
+            typeof(Match)
+                .GetProperty(nameof(Match.EndTime))!
+                .SetValue(FinishedMatch, DateTime.UtcNow);
+
             _dataSource.Setup(i => i.GetAllMatches()).Returns([FinishedMatch]);
         }
 

@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 
 namespace FootballWorldCupScoreBoard.Repository
 {
-    public class MatchDataSource : IMatchDataSource
+    public sealed class MatchDataSource : IMatchDataSource
     {
         private readonly ConcurrentDictionary<Guid, Match> _matches;
 
