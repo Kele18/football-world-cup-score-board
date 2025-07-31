@@ -19,7 +19,11 @@ namespace FootballWorldCupScoreBoard.Service
 
         public void UpdateScore(Guid matchId, int homeScore, int awayScore)
         {
-            throw new NotImplementedException();
+            Match match = dataSource.GetMatch(matchId) ?? throw new KeyNotFoundException("No match in progress found.");
+
+            match.UpdateScore(homeScore, awayScore);
+
+            logger.LogInformation("Updated score: {Home}-{HomeScore} vs {Away}-{AwayScore}", match.HomeTeam, homeScore, match.AwayTeam, awayScore);
         }
 
         public void FinishMatch(Guid matchId)
