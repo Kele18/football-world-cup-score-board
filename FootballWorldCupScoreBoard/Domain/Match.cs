@@ -10,8 +10,9 @@
         public Team AwayTeam { get; }
         public Score Score { get; }
         public DateTime StartTime { get; }
-        public MatchStatus Status { get; }
-        public int? FinishedAtMinute { get; private set; }
+        public MatchStatus Status { get; private set; }
+
+        public DateTime? EndTime { get; private set; }
 
         public Match(Team home, Team away)
         {
@@ -42,6 +43,12 @@
                 for (int i = 0; i < awayDelta; i++)
                     _goalEvents.Add(new GoalEvent(TeamSide.Away, DateTime.UtcNow, currentMinute));
             }
+        }
+
+        public void Finish(int minutePlayed = 90)
+        {
+            Status = MatchStatus.Finished;
+            EndTime = DateTime.UtcNow.AddMinutes(minutePlayed - 90);
         }
     }
 }

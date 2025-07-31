@@ -8,7 +8,7 @@ namespace FootballWorldCupScoreBoard.Interface
 
         void UpdateScore(Guid matchId, int homeScore, int awayScore);
 
-        void FinishMatch(Guid matchId);
+        void FinishMatch(Guid matchId, int minutePlayed = 90);
 
         public List<Match> MatchesSummary();
     }

@@ -26,9 +26,14 @@ namespace FootballWorldCupScoreBoard.Service
             logger.LogInformation("Updated score: {Home}-{HomeScore} vs {Away}-{AwayScore}", match.HomeTeam, homeScore, match.AwayTeam, awayScore);
         }
 
-        public void FinishMatch(Guid matchId)
+        public void FinishMatch(Guid matchId, int minutePlayed = 90)
         {
-            throw new NotImplementedException();
+            var match = dataSource.GetMatch(matchId) ?? throw new KeyNotFoundException("Match not found.");
+
+            match.Finish(minutePlayed);
+            dataSource.Remove(matchId);
+
+            logger.LogInformation("Finished match {Id}", matchId);
         }
 
         public List<Match> MatchesSummary()
