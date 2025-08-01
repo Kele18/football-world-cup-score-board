@@ -10,7 +10,7 @@ namespace WorldCupScoreBoard.Tests.UnitTests
         [Fact]
         public void MatchesSummary_FiltersOnlyInProgressMatches()
         {
-            var result = Sut.MatchesSummary();
+            var result = Sut.GetLiveSummary();
 
             result.Should().OnlyContain(m => m.Status == MatchStatus.InProgress);
         }
@@ -18,7 +18,7 @@ namespace WorldCupScoreBoard.Tests.UnitTests
         [Fact]
         public void MatchesSummary_OrdersByTotalScoreDescending_ThenByStartTimeDescending()
         {
-            var result = Sut.MatchesSummary();
+            var result = Sut.GetLiveSummary();
 
             result.Should().HaveCount(3);
             result[0].Should().Be(MatchWithHighestScore);
@@ -31,7 +31,7 @@ namespace WorldCupScoreBoard.Tests.UnitTests
         {
             SetupEmptyMatches();
 
-            var result = Sut.MatchesSummary();
+            var result = Sut.GetLiveSummary();
 
             result.Should().BeEmpty();
         }
@@ -41,7 +41,7 @@ namespace WorldCupScoreBoard.Tests.UnitTests
         {
             SetupOnlyFinishedMatches();
 
-            var result = Sut.MatchesSummary();
+            var result = Sut.GetLiveSummary();
 
             result.Should().BeEmpty();
         }

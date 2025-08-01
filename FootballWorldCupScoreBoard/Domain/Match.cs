@@ -34,15 +34,15 @@
             }
         }
 
-        public void UpdateScore(int home, int away)
+        public void UpdateScore(int absoulteHomeScore, int absouluteAwayScore)
         {
             lock (_lock)
             {
                 int currentMinute = (int)(DateTime.UtcNow - StartTime).TotalMinutes;
 
-                int homeDelta = home - Score.Home;
-                int awayDelta = away - Score.Away;
-                Score.Update(home, away);
+                int homeDelta = absoulteHomeScore - Score.Home;
+                int awayDelta = absouluteAwayScore - Score.Away;
+                Score.Update(absoulteHomeScore, absouluteAwayScore);
 
                 for (int i = 0; i < homeDelta; i++)
                     _goalEvents.Add(new GoalEvent(TeamSide.Home, DateTime.UtcNow, currentMinute));

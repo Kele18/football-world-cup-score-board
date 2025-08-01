@@ -18,7 +18,7 @@ namespace FootballWorldCupScoreBoard.Interface
 
         void Abandon(Guid matchId);
 
-        IList<Match> MatchesSummary();
+        IList<Match> GetLiveSummary();
 
         IList<Match> GetScheduled();
 

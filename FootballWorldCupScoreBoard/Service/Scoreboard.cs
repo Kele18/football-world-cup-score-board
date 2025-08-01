@@ -61,7 +61,7 @@ namespace FootballWorldCupScoreBoard.Service
             logger.LogInformation("Finished match {Id}", matchId);
         }
 
-        public IList<Match> MatchesSummary()
+        public IList<Match> GetLiveSummary()
         {
             return dataSource.GetAllMatches()
                              .Where(m => m.Status == MatchStatus.InProgress)
