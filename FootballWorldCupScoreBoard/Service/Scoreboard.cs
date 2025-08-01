@@ -7,6 +7,7 @@ namespace FootballWorldCupScoreBoard.Service
     public class Scoreboard(
         IMatchDataSource dataSource,
         IScheduledMatchDataSource scheduledMatchDataSource,
+        IArchiveMatchDataSource archiveMatchDataSource,
         ILogger<IScoreboard> logger) : IScoreboard
     {
         public Match ScheduleMatch(Team home, Team away, DateTime scheduledTime)
@@ -53,7 +54,9 @@ namespace FootballWorldCupScoreBoard.Service
             var match = dataSource.GetMatch(matchId) ?? throw new KeyNotFoundException("Match not found.");
 
             match.Finish(minutePlayed);
+
             dataSource.Remove(matchId);
+            ArchiveIfEnded(match);
 
             logger.LogInformation("Finished match {Id}", matchId);
         }
@@ -87,6 +90,8 @@ namespace FootballWorldCupScoreBoard.Service
             if (!scheduledMatchDataSource.Remove(matchId))
                 throw new InvalidOperationException($"Failed to remove canceled match {matchId} from scheduled list.");
 
+            ArchiveIfEnded(match);
+
             logger.LogInformation("Canceled match {Id}", matchId);
         }
 
@@ -100,9 +105,21 @@ namespace FootballWorldCupScoreBoard.Service
             if (!dataSource.Remove(matchId))
                 throw new InvalidOperationException($"Failed to remove abandoned match {matchId} from active list.");
 
+            ArchiveIfEnded(match);
+
             logger.LogInformation("Abandoned match {Id}", matchId);
         }
 
         public IList<Match> GetScheduled() => scheduledMatchDataSource.GetAllMatches().ToList();
+
+        public IList<Match> GetArchived() => archiveMatchDataSource.GetAllMatches().ToList();
+
+        private void ArchiveIfEnded(Match match)
+        {
+            if (match.Status != MatchStatus.InProgress)
+            {
+                archiveMatchDataSource.Add(match);
+            }
+        }
     }
 }

@@ -15,4 +15,7 @@ namespace FootballWorldCupScoreBoard.Interface
 
     public interface IScheduledMatchDataSource : IMatchDataSource
     { }
+
+    public interface IArchiveMatchDataSource : IMatchDataSource
+    { }
 }

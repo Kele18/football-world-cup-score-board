@@ -15,6 +15,7 @@ namespace WorldCupScoreBoard.Tests.UnitTests
             ActiveMatch.Status.Should().Be(MatchStatus.Abandoned);
             ActiveMatch.EndTime.Should().NotBeNull();
             VerifyRemoveCalled();
+            VerifyArchievedCalledOnce();
         }
 
         [Fact]
@@ -26,6 +27,8 @@ namespace WorldCupScoreBoard.Tests.UnitTests
 
             act.Should().Throw<InvalidOperationException>()
                .WithMessage("Only matches in progress can be abandoned.");
+
+            VerifyRemoveAndArchivedNotCalled();
         }
 
         [Fact]
@@ -66,6 +69,17 @@ namespace WorldCupScoreBoard.Tests.UnitTests
         public void VerifyRemoveCalled()
         {
             _dataSource.Verify(x => x.Remove(ActiveMatch.Id), Times.Once);
+        }
+
+        public void VerifyArchievedCalledOnce()
+        {
+            _archiveMatchDataSource.Verify(i => i.Add(ActiveMatch), Times.Once);
+        }
+
+        public void VerifyRemoveAndArchivedNotCalled()
+        {
+            _dataSource.Verify(i => i.Remove(It.IsAny<Guid>()), Times.Never);
+            _archiveMatchDataSource.Verify(i => i.Add(It.IsAny<Match>()), Times.Never);
         }
     }
 }

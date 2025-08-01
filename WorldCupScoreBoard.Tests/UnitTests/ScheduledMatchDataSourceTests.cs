@@ -78,20 +78,21 @@ namespace WorldCupScoreBoard.Tests.UnitTests
         public IScheduledMatchDataSource Sut { get; }
         public Match ScheduledMatch { get; }
         public Match InvalidMatch { get; }
-        public Match Scheduled1 { get; private set; }
-        public Match Scheduled2 { get; private set; }
+        public Match Scheduled1 { get; }
+        public Match Scheduled2 { get; }
 
         public ScheduledMatchDataSourceDriver()
         {
             Sut = new ScheduledMatchDataSource();
             ScheduledMatch = Match.CreateScheduled(new Team("Germany"), new Team("Japan"), DateTime.UtcNow.AddHours(1));
-            InvalidMatch = new Match(new Team("Brazil"), new Team("Argentina")); // Status: InProgress
+            InvalidMatch = new Match(new Team("Brazil"), new Team("Argentina"));
+
+            Scheduled1 = Match.CreateScheduled(new Team("Belgium"), new Team("Canada"), DateTime.UtcNow.AddHours(2));
+            Scheduled2 = Match.CreateScheduled(new Team("Croatia"), new Team("Morocco"), DateTime.UtcNow.AddHours(3));
         }
 
         public void SetupMultipleScheduledMatches()
         {
-            Scheduled1 = Match.CreateScheduled(new Team("Belgium"), new Team("Canada"), DateTime.UtcNow.AddHours(2));
-            Scheduled2 = Match.CreateScheduled(new Team("Croatia"), new Team("Morocco"), DateTime.UtcNow.AddHours(3));
             Sut.Add(Scheduled1);
             Sut.Add(Scheduled2);
         }

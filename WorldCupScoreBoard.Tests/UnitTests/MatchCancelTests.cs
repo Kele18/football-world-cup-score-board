@@ -15,6 +15,7 @@ namespace WorldCupScoreBoard.Tests.UnitTests
             ScheduledMatch.Status.Should().Be(MatchStatus.Cancelled);
             ScheduledMatch.EndTime.Should().NotBeNull();
             VerifyRemoveFromScheduledDataSourceCalled();
+            VerifyArchievedCalledOnce();
         }
 
         [Fact]
@@ -26,6 +27,8 @@ namespace WorldCupScoreBoard.Tests.UnitTests
 
             act.Should().Throw<InvalidOperationException>()
                .WithMessage("Only scheduled matches can be canceled.");
+
+            VerifyRemoveAndArchivedNotCalled();
         }
 
         [Fact]
@@ -70,6 +73,17 @@ namespace WorldCupScoreBoard.Tests.UnitTests
         public void VerifyRemoveFromScheduledDataSourceCalled()
         {
             _scheduledMatchDataSource.Verify(x => x.Remove(ScheduledMatch.Id), Times.Once);
+        }
+
+        public void VerifyArchievedCalledOnce()
+        {
+            _archiveMatchDataSource.Verify(i => i.Add(ScheduledMatch), Times.Once);
+        }
+
+        public void VerifyRemoveAndArchivedNotCalled()
+        {
+            _scheduledMatchDataSource.Verify(i => i.Remove(It.IsAny<Guid>()), Times.Never);
+            _archiveMatchDataSource.Verify(i => i.Add(It.IsAny<Match>()), Times.Never);
         }
     }
 }

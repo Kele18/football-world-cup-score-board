@@ -21,6 +21,7 @@ namespace WorldCupScoreBoard.Tests.UnitTests
 
             VerifyGetMatchCalledOnce();
             VerifyRemoveCalledOnce();
+            VerifyArchievedCalledOnce();
         }
 
         [Fact]
@@ -31,6 +32,7 @@ namespace WorldCupScoreBoard.Tests.UnitTests
             Sut.FinishMatch(Match.Id);
 
             Match.EndTime.Should().BeCloseTo(before, TimeSpan.FromSeconds(2));
+            VerifyArchievedCalledOnce();
         }
 
         [Fact]
@@ -42,6 +44,8 @@ namespace WorldCupScoreBoard.Tests.UnitTests
 
             act.Should().Throw<KeyNotFoundException>()
                .WithMessage("Match not found.");
+
+            VerifyRemoveAndArchivedNotCalled();
         }
 
         [Fact]
@@ -86,6 +90,17 @@ namespace WorldCupScoreBoard.Tests.UnitTests
         public void VerifyRemoveCalledOnce()
         {
             _dataSource.Verify(i => i.Remove(Match.Id), Times.Once);
+        }
+
+        public void VerifyArchievedCalledOnce()
+        {
+            _archiveMatchDataSource.Verify(i => i.Add(Match), Times.Once);
+        }
+
+        public void VerifyRemoveAndArchivedNotCalled()
+        {
+            _dataSource.Verify(i => i.Remove(It.IsAny<Guid>()), Times.Never);
+            _archiveMatchDataSource.Verify(i => i.Add(It.IsAny<Match>()), Times.Never);
         }
     }
 }

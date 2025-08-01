@@ -60,12 +60,14 @@ namespace WorldCupScoreBoard.Tests.UnitTests
     {
         public Match Match { get; }
         public IMatchDataSource Sut { get; }
-        public Match Match1 { get; private set; }
-        public Match Match2 { get; private set; }
+        public Match Match1 { get; }
+        public Match Match2 { get; }
 
         public MatchDataSourceDriver()
         {
             Match = new Match(new Team("Argentina"), new Team("France"));
+            Match1 = new Match(new Team("Portugal"), new Team("Uruguay"));
+            Match2 = new Match(new Team("USA"), new Team("Mexico"));
             Sut = new MatchDataSource();
         }
 
@@ -76,8 +78,6 @@ namespace WorldCupScoreBoard.Tests.UnitTests
 
         public void SetupMatches()
         {
-            Match1 = new Match(new Team("Portugal"), new Team("Uruguay"));
-            Match2 = new Match(new Team("USA"), new Team("Mexico"));
             Sut.Add(Match1);
             Sut.Add(Match2);
         }

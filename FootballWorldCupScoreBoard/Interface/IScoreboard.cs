@@ -21,5 +21,7 @@ namespace FootballWorldCupScoreBoard.Interface
         IList<Match> MatchesSummary();
 
         IList<Match> GetScheduled();
+
+        IList<Match> GetArchived();
     }
 }
