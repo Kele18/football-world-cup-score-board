@@ -12,6 +12,14 @@ namespace FootballWorldCupScoreBoard.Interface
 
         void FinishMatch(Guid matchId, int minutePlayed = 90);
 
-        public List<Match> MatchesSummary();
+        void UndoGoal(Guid matchId, TeamSide side, string? reason = null);
+
+        void CancelMatch(Guid matchId);
+
+        void Abandon(Guid matchId);
+
+        IList<Match> MatchesSummary();
+
+        IList<Match> GetScheduled();
     }
 }

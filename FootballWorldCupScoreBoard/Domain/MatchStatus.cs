@@ -6,7 +6,8 @@
         Scheduled,
         InProgress,
         Finished,
-        Cancelled
+        Cancelled,
+        Abandoned
     }
 
     public enum TeamSide

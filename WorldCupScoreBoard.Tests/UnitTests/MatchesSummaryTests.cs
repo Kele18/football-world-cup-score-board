@@ -106,11 +106,8 @@ namespace WorldCupScoreBoard.Tests.UnitTests
             _dataSource.Setup(i => i.GetAllMatches()).Returns([FinishedMatch]);
         }
 
-        private void SetStartTime(Match match, DateTime time)
-        {
-            typeof(Match)
+        private static void SetStartTime(Match match, DateTime time) => typeof(Match)
                 .GetField("<StartTime>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!
                 .SetValue(match, time);
-        }
     }
 }

@@ -12,10 +12,12 @@ namespace FootballWorldCupScoreBoard.Service
         public Match ScheduleMatch(Team home, Team away, DateTime scheduledTime)
         {
             var match = Match.CreateScheduled(home, away, scheduledTime);
+
             if (!scheduledMatchDataSource.Add(match))
                 throw new InvalidOperationException("Match already scheduled.");
 
             logger.LogInformation("Scheduled match: {Home} vs {Away} at {Time}", home.Name, away.Name, scheduledTime);
+
             return match;
         }
 
@@ -56,7 +58,7 @@ namespace FootballWorldCupScoreBoard.Service
             logger.LogInformation("Finished match {Id}", matchId);
         }
 
-        public List<Match> MatchesSummary()
+        public IList<Match> MatchesSummary()
         {
             return dataSource.GetAllMatches()
                              .Where(m => m.Status == MatchStatus.InProgress)
@@ -64,5 +66,43 @@ namespace FootballWorldCupScoreBoard.Service
                              .ThenByDescending(m => m.StartTime)
                              .ToList();
         }
+
+        public void UndoGoal(Guid matchId, TeamSide side, string? reason = null)
+        {
+            var match = dataSource.GetMatch(matchId)
+            ?? throw new KeyNotFoundException("Match not found.");
+
+            match.UndoLastGoal(side, reason);
+
+            logger.LogInformation("Undid goal for {Side} in match {Id}. Reason: {Reason}", side, matchId, reason);
+        }
+
+        public void CancelMatch(Guid matchId)
+        {
+            var match = scheduledMatchDataSource.GetMatch(matchId)
+                        ?? throw new KeyNotFoundException("Match not found.");
+
+            match.Cancel();
+
+            if (!scheduledMatchDataSource.Remove(matchId))
+                throw new InvalidOperationException($"Failed to remove canceled match {matchId} from scheduled list.");
+
+            logger.LogInformation("Canceled match {Id}", matchId);
+        }
+
+        public void Abandon(Guid matchId)
+        {
+            var match = dataSource.GetMatch(matchId)
+                        ?? throw new KeyNotFoundException("Match not found.");
+
+            match.Abandon();
+
+            if (!dataSource.Remove(matchId))
+                throw new InvalidOperationException($"Failed to remove abandoned match {matchId} from active list.");
+
+            logger.LogInformation("Abandoned match {Id}", matchId);
+        }
+
+        public IList<Match> GetScheduled() => scheduledMatchDataSource.GetAllMatches().ToList();
     }
 }
