@@ -15,12 +15,12 @@ Library for managing a live scoreboard of Football World Cup matches.
 ## Core Functionalities
 
 - **Schedule Match** : Add a match to the schedule
-- **Start Match** : Move match to `InProgress` and track its real start time  
-- **Update Score** : Update absolute score
-- **Undo Goal** : Undo the last goal per side
+- **Start Match** : Move match to `InProgress` and track its start time  
+- **Update Score** : Set the absolute score for each team
+- **Undo Goal** : Undo the most recent goal for a team
 - **Finish Match**: Ends the match, archives it.
-- **Cancel/Abandon** : Handles posibily cancelation or abandon of match
-- **GetLiveSummary** : Return `InProgress` matches otderd by total score and the recent.
+- **Cancel/Abandon** : Handle special cases like cancellation or abandonment
+- **GetLiveSummary** : Return `InProgress` matches otderd by total score and most recent start time
 
 ## How to use
 ```csharp
@@ -40,6 +40,7 @@ scoreboard.FinishMatch(match.Id);
 
 // Summary
 var activeMatches = scoreboard.MatchesSummary();
+```
 
 ### Future Improvements
 - Introduce Match clock that tracks active play periods
